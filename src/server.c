@@ -21,6 +21,8 @@ xcp_errno_t xcp_listen(unsigned short port, xcp_handler_t handler, xcp_server_t 
 
             if (bind(sock, (struct sockaddr *)&_server->addr, sizeof(struct sockaddr_in)) == 0) {
                 if (listen(sock, 0) == 0) {
+                    xcp_mtx_init(&_server->mtx);
+
                     _server->sock = sock;
                     _server->running = XCP_TRUE;
                     *server = _server;
@@ -41,9 +43,9 @@ xcp_errno_t xcp_serve(xcp_server_t *server) {
     while (XCP_TRUE) {
         xcp_bool_t running;
 
-        xcp_mtx_lock(server->mtx);
+        xcp_mtx_lock(&server->mtx);
         running = server->running;
-        xcp_mtx_unlock(server->mtx);
+        xcp_mtx_unlock(&server->mtx);
 
         if (running) {
             xcp_handle_t link;
@@ -77,6 +79,7 @@ xcp_errno_t xcp_close(xcp_server_t *server) {
     server->running = XCP_FALSE;
     xcp_mtx_unlock(&server->mtx);
 
+    xcp_mtx_destroy(&server->mtx);
     xcp_sock_close(server->sock);
 
     free(server);

@@ -40,8 +40,25 @@ extern XCPAPI int xcp_sock_close(xcp_sock_t sock);
 ** Mutual exclusion
 */
 
-#define xcp_mtx_lock(m)
-#define xcp_mtx_unlock(m)
+typedef struct __xcp_mtx_t {
+#ifdef _WIN32
+    CRITICAL_SECTION cs;
+#else
+    pthread_mutex_t ptm;
+#endif
+} xcp_mtx_t;
+
+#ifdef _WIN32
+#define xcp_mtx_init(m)     InitializeCriticalSection(&(m)->cs)
+#define xcp_mtx_lock(m)     EnterCriticalSection(&(m)->cs)
+#define xcp_mtx_unlock(m)   LeaveCriticalSection(&(m)->cs)
+#define xcp_mtx_destroy(m)  DeleteCriticalSection(&(m)->cs)
+#else
+#define xcp_mtx_init(m)     pthread_mutex_init(&(m)->ptm, NULL)
+#define xcp_mtx_lock(m)     pthread_mutex_lock(&(m)->ptm)
+#define xcp_mtx_unlock(m)   pthread_mutex_unlock(&(m)->ptm)
+#define xcp_mtx_destroy(m)  pthread_mutex_destroy(&(m)->ptm)
+#endif
 
 /*
 ** Data types
@@ -60,6 +77,7 @@ struct __xcp_server_t {
     struct sockaddr_in addr;
     xcp_sock_t sock;
     xcp_bool_t running;
+    xcp_mtx_t mtx;
 };
 
 struct __xcp_call_t {
