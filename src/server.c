@@ -12,7 +12,7 @@ xcp_errno_t xcp_listen(unsigned short port, xcp_handler_t handler, xcp_server_t 
         if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR | SO_REUSEPORT, &opt, sizeof(int)) == 0) {
             xcp_server_t *_server;
 
-            _server = (xcp_server_t *)malloc(sizeof(xcp_server_t));
+            _server = (xcp_server_t *)xcp_alloc(sizeof(xcp_server_t));
             _server->port = port;
             _server->handler = handler;
             _server->addr.sin_family = AF_INET;
@@ -31,7 +31,7 @@ xcp_errno_t xcp_listen(unsigned short port, xcp_handler_t handler, xcp_server_t 
                 }
             }
 
-            free(_server);
+            xcp_free(_server);
         }
         xcp_sock_close(sock);
     }
@@ -82,7 +82,7 @@ xcp_errno_t xcp_close(xcp_server_t *server) {
     xcp_mtx_destroy(&server->mtx);
     xcp_sock_close(server->sock);
 
-    free(server);
+    xcp_free(server);
 
     return XCP_S_OK;
 }

@@ -15,6 +15,7 @@ xcp_errno_t xcp_marshal(xcp_sock_t sock, const xcp_variant_t *var) {
     case XCP_VT_USHORT:
         send(sock, &var->val, 2, 0);
         return XCP_S_OK;
+    case XCP_VT_ERRNO:
     case XCP_VT_INT:
     case XCP_VT_UINT:
     case XCP_VT_FLOAT:
@@ -64,6 +65,7 @@ xcp_errno_t xcp_unmarshal(xcp_sock_t sock, xcp_variant_t *var) {
     case XCP_VT_USHORT:
         recv(sock, &var->val, 2, 0);
         return XCP_S_OK;
+    case XCP_VT_ERRNO:
     case XCP_VT_INT:
     case XCP_VT_UINT:
     case XCP_VT_FLOAT:
@@ -80,7 +82,7 @@ xcp_errno_t xcp_unmarshal(xcp_sock_t sock, xcp_variant_t *var) {
         unsigned int length;
 
         recv(sock, &length, sizeof(unsigned int), 0);
-        var->val.sz = (char *)malloc((length + 1) * sizeof(char));
+        var->val.sz = (char *)xcp_alloc((length + 1) * sizeof(char));
         recv(sock, var->val.sz, length * sizeof(char), 0);
         var->val.sz[length] = '\0';
     }

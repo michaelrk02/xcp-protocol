@@ -68,7 +68,6 @@ struct __xcp_client_t {
     char address[128];
     unsigned short port;
     struct sockaddr_in addr;
-    xcp_sock_t sock;
 };
 
 struct __xcp_server_t {

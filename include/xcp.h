@@ -20,6 +20,8 @@
 #define XCPAPI __XCP_IMPORT
 #endif
 
+#include <stdlib.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -36,6 +38,9 @@ extern "C" {
         XCP_MAKE_WORD(d, c), \
         XCP_MAKE_WORD(b, a) \
     )
+
+#define xcp_alloc(size)     malloc(size)
+#define xcp_free(ptr)       free(ptr)
 
 /*
 ** Error type
@@ -117,10 +122,50 @@ struct __xcp_variant_t {
 };
 #pragma pack(pop)
 
+/* Variant setters */
+extern XCPAPI void xcp_var_set_errno(xcp_variant_t *var, xcp_errno_t val);
+extern XCPAPI void xcp_var_set_bool(xcp_variant_t *var, xcp_bool_t val);
+extern XCPAPI void xcp_var_set_char(xcp_variant_t *var, char val);
+extern XCPAPI void xcp_var_set_uchar(xcp_variant_t *var, unsigned char val);
+extern XCPAPI void xcp_var_set_short(xcp_variant_t *var, short val);
+extern XCPAPI void xcp_var_set_ushort(xcp_variant_t *var, unsigned short val);
+extern XCPAPI void xcp_var_set_int(xcp_variant_t *var, int val);
+extern XCPAPI void xcp_var_set_uint(xcp_variant_t *var, unsigned int val);
+extern XCPAPI void xcp_var_set_long(xcp_variant_t *var, char val);
+extern XCPAPI void xcp_var_set_ulong(xcp_variant_t *var, unsigned char val);
+extern XCPAPI void xcp_var_set_float(xcp_variant_t *var, float val);
+extern XCPAPI void xcp_var_set_double(xcp_variant_t *var, double val);
+extern XCPAPI void xcp_var_set_string(xcp_variant_t *var, const char *val);
+extern XCPAPI void xcp_var_set_sequence(xcp_variant_t *var, const xcp_sequence_t *val);
+
+/* Variant getters */
+extern XCPAPI xcp_errno_t xcp_var_get_errno(const xcp_variant_t *var);
+extern XCPAPI xcp_bool_t xcp_var_get_bool(const xcp_variant_t *var);
+extern XCPAPI char xcp_var_get_char(const xcp_variant_t *var);
+extern XCPAPI unsigned char xcp_var_get_uchar(const xcp_variant_t *var);
+extern XCPAPI short xcp_var_get_short(const xcp_variant_t *var);
+extern XCPAPI unsigned short xcp_var_get_ushort(const xcp_variant_t *var);
+extern XCPAPI int xcp_var_get_int(const xcp_variant_t *var);
+extern XCPAPI unsigned int xcp_var_get_uint(const xcp_variant_t *var);
+extern XCPAPI long long xcp_var_get_long(const xcp_variant_t *var);
+extern XCPAPI unsigned long long xcp_var_get_ulong(const xcp_variant_t *var);
+extern XCPAPI float xcp_var_get_float(const xcp_variant_t *var);
+extern XCPAPI double xcp_var_get_double(const xcp_variant_t *var);
+extern XCPAPI void xcp_var_get_string(const xcp_variant_t *var, char **val);
+extern XCPAPI void xcp_var_get_sequence(const xcp_variant_t *var, xcp_sequence_t *val);
+
+/* Sequence operations */
+extern XCPAPI void xcp_seq_set(xcp_sequence_t *seq, xcp_vartype_t vt, unsigned int n, const void *arr);
+extern XCPAPI unsigned int xcp_seq_get(const xcp_sequence_t *seq, xcp_vartype_t vt, void **arr);
+
+/* Memory management */
+
+extern XCPAPI void xcp_variant_copy(xcp_variant_t *dst, const xcp_variant_t *src);
 extern XCPAPI void xcp_variant_free(xcp_variant_t *var);
 
 extern XCPAPI xcp_errno_t xcp_sequence_alloc(xcp_sequence_t *seq);
 extern XCPAPI void xcp_sequence_free(xcp_sequence_t *seq);
+extern XCPAPI xcp_errno_t xcp_sequence_copy(xcp_sequence_t *dst, const xcp_sequence_t *src);
 
 /*
 ** Remote procedure calls
